@@ -1,19 +1,47 @@
 #include <iostream>
 #include <fstream>
+#include <sstream>
+#include <string>
 
 using namespace std;
 const char *nombre_archivo = "traductor.txt";
 
 struct Traductor{
 	string palabra;
+	string Npalabra;
 	string traduccion;
 	string funcionalidad;
 };
 
 void ingresar();
+void abrir();
 
 main(){
-	ingresar();
+	int opcion;
+	
+	while(true){
+		cout<<"1 - Agregar"<<endl;
+		cout<<"2 - Leer"<<endl;
+		cout<<"3 - Modificar"<<endl;
+		cout<<"4 - Eliminar"<<endl;
+		cout<<"Ingrese una opcion: ";
+		cin>>opcion;
+		
+		system("cls");
+		switch(opcion){
+			case 1:
+				{
+					ingresar();
+					break;
+				}
+			case 2:
+				{
+					abrir();
+					break;
+				}
+		}
+	}
+	return 0;
 }
 
 void abrir (){
@@ -35,13 +63,13 @@ void abrir (){
 }
 
 void ingresar(){
-	ofstream archivo;
-	archivo.open(nombre_archivo, ios::app); 
+	ofstream guardar;
+	guardar.open(nombre_archivo, ios::app); 
 
 	char s;
 	Traductor traductor;
 	
-	if(archivo.fail()){
+	if(guardar.fail()){
 		cout<<"No es posible abrir el archivo"<<endl;
 		exit(1);
 	}else{
@@ -54,7 +82,7 @@ void ingresar(){
 			cin.ignore();
 			getline(cin, traductor.funcionalidad);
 			
-			archivo<<traductor.palabra<<", "<<traductor.traduccion<<", "<<traductor.funcionalidad<<endl;
+			guardar<<traductor.palabra<<", "<<traductor.traduccion<<", "<<traductor.funcionalidad<<endl;
 			
 			cout<<"Desea agregar mas datos (s/n)";
 			cin>>s;
@@ -62,6 +90,6 @@ void ingresar(){
 		}while(s=='s');
 	}
 	
-	archivo.close();
+	guardar.close();
 	//abrir();
 }
