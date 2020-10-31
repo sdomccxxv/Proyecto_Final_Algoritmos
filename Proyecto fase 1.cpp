@@ -1,11 +1,20 @@
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <windows.h>
 #include <stdlib.h>
 #include <string.h>
 #include <conio.h>  
 #include <stdio.h> 
+#include "Clases.cpp"
+
 using namespace std;
+
+Traductor palabras[100];
+
+void agregarPalabras();
+string ingresarCodigo();
+string traducirCodigo(string);
 
 int menu() {
 	system("cls");
@@ -16,8 +25,9 @@ int menu() {
 	cout<<"3. Buscar Palabra"<<endl;
 	cout<<"4. Modificar Palabra"<<endl;
 	cout<<"5. Borrar Palabra"<<endl;
-	cout<<"6. Salir"<<endl<<endl;
-	cout<<"Escoja una Opcion: (1-6)"<<endl;
+	cout<<"6. Traducir Codigo"<<endl;
+	cout<<"7. Salir"<<endl<<endl;
+	cout<<"Escoja una Opcion: (1-7)"<<endl;
 	cin>>a;
 	return a;
 }
@@ -126,7 +136,6 @@ void buscarPalabras(ifstream &lec) {
 }
 
 //Modificar
-
 void modificafuncio(ifstream & Lec)
 {
 	system("cls");
@@ -218,7 +227,6 @@ cout<<">>>---------El registro se ha modificado exitosamente--------<<<"<<endl;
 }
 
 //Eliminar
-
 void eliminar(ifstream & Lec){
 	system("cls");
 		
@@ -342,15 +350,159 @@ int main() {
 				eliminar(lec);
 				system("cls");
 				
-				
-			break;			
+			break;
+			
+			case 6:
+				agregarPalabras();
+				string traduccion = traducirCodigo(ingresarCodigo());
+				cout<<"\n-----------------------TRADUCCION-----------------------\n\n";
+				cout<<traduccion;
+			break;		
 			
 		}
 		
 		
 		
-	} while(sh !=6);
+	} while(sh !=7);
 	return 0;
 	system("pause");
 	
+}
+
+void agregarPalabras(){
+	cout<<1<<endl;
+	ifstream archivo_entrada("Traductor.txt");;
+    string linea, palabra1, palabra2;
+    int contador = 0;
+    bool bandera;
+
+    while(getline(archivo_entrada, linea)) {
+	
+    	string str(linea);
+        istringstream isstream(str);
+        bandera = true;
+
+    	while(!isstream.eof()){
+    		
+        	string tempStr;
+        	isstream >> tempStr;
+        	
+        	if(bandera) {
+				palabra1 = tempStr;
+        	}
+			else {
+				palabra2 = tempStr;	
+			}
+			
+			if(!bandera) break;
+			bandera = false;    	
+    	}
+
+    	palabras[contador] = Traductor(palabra1, palabra2);
+    	contador++;
+        
+    }
+
+}
+
+string ingresarCodigo(){
+	
+	cout<<1<<endl;
+	string codigo, linea;
+	
+	cout<<"Ingrese el codigo que desea traducir"<<endl;
+	cout<<"Escriba \"fin\" y presione enter para mostrarlo como pseudocodigo"<<endl<<endl;
+	
+	cout<<2<<endl;
+	
+	while(true){
+		getline(cin, linea);
+		
+        if(linea != "fin") {
+        	codigo += linea + "\n";
+			cout<<linea<<endl;
+			cout<<3<<endl;
+		}
+		
+        else{
+        	cout<<4<<endl;	
+        	cout<<linea<<endl;
+        	break;	
+			cout<<5<<endl;	
+		} 
+	}
+	
+	
+	
+	return codigo;
+	
+}
+
+string traducirCodigo(string codigo){
+	
+	cout<<codigo;
+	
+	string str(codigo);
+    istringstream isstream(str);
+    string llaveInicio = "", llaveFin = "";
+
+    while(!isstream.eof()){
+    	
+    	
+        string tempStr;
+        isstream >> tempStr;
+        
+        if(tempStr != "{" && tempStr != "}"){
+		cout<<"125";
+			for(int i = 0; i<100; i++){
+				
+				if(tempStr == palabras[i].getPalabra()){
+					
+					if(tempStr == "if"){
+						llaveInicio = "inicio si";
+						llaveFin = "fin si\n";
+					}else if(tempStr == "else"){
+						llaveInicio = "inicio entonces";
+						llaveFin = "fin entonces\n";
+					}else if(tempStr == "while"){
+						llaveInicio = "inicio mientras";
+						llaveFin = "fin mientras\n";
+					}else if(tempStr == "for"){
+						llaveInicio = "inicio para";
+						llaveFin = "fin para\n";
+					}  
+						
+					string::size_type pos = codigo.find(tempStr, 0);
+	                if (pos < string::npos) codigo.replace(pos, string(tempStr).length(), palabras[i].getTraduccion());	
+						
+			    }
+				
+			}
+			
+		}else if(tempStr == "{" && llaveInicio != ""){
+			
+			string::size_type pos = codigo.find(tempStr, 0);
+	        if (pos < string::npos) codigo.replace(pos, string(tempStr).length(), llaveInicio);
+			llaveInicio = "";		
+			
+		}else if(tempStr == "}" && llaveFin != ""){
+			
+			string::size_type pos = codigo.find(tempStr, 0);
+	        if (pos < string::npos) codigo.replace(pos, string(tempStr).length(), llaveFin);
+			llaveFin = "";			
+					
+		}else if(tempStr == "{"){
+			
+			string::size_type pos = codigo.find(tempStr, 0);
+	        if (pos < string::npos) codigo.replace(pos, string(tempStr).length(), "_");
+			
+		}
+	
+    }
+    
+    string::size_type pos = codigo.find("_", 0);
+	if (pos < string::npos) codigo.replace(pos, string("=_").length(), "{");
+    
+    return codigo;
+		
 }
